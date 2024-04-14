@@ -1,27 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Dispatch, SetStateAction } from "react";
 import { motion } from "framer-motion";
-import { createPublicClient, formatEther, formatGwei, http, parseEther } from "viem";
-import { mainnet, sepolia } from "viem/chains";
-import { Connector, useAccount, useConnect } from "wagmi";
-import { ChevronRightIcon, MinusCircleIcon, PlusCircleIcon } from "@heroicons/react/20/solid";
+import { formatEther, parseEther } from "viem";
+import { PublicClient, useAccount, useConnect } from "wagmi";
+import { MinusCircleIcon, PlusCircleIcon } from "@heroicons/react/20/solid";
 import { Spinner } from "~~/components/assets/Spinner";
 import { rainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-import scaffoldConfig from "~~/scaffold.config";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 type FindNameProps = {
   pages: number;
   setPages: Dispatch<SetStateAction<number>>;
+  publicClient: PublicClient;
 };
 
-export const RegisterName = ({ setPages, pages }: FindNameProps) => {
+export const RegisterName = ({ setPages, pages, publicClient }: FindNameProps) => {
   const accountState = useAccount();
-
-  const publicClient = createPublicClient({
-    chain: sepolia,
-    transport: http(`https://eth-sepolia.g.alchemy.com/v2/${scaffoldConfig.alchemyApiKey}`),
-  });
 
   const getGasPrice = async (_newPrice: number) => {
     try {
@@ -82,6 +76,10 @@ export const RegisterName = ({ setPages, pages }: FindNameProps) => {
   useEffect(() => {
     handleYearsChange();
   }, [years]);
+
+  const viewVariables = () => {
+    console.log(["remy", "onchain", accountState.address, 65536, durationTimestamp]);
+  };
 
   const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
     contractName: "RegisterName",
@@ -165,7 +163,10 @@ export const RegisterName = ({ setPages, pages }: FindNameProps) => {
               </p>
               {accountState.isConnected ? (
                 <p
-                  onClick={writeAsync}
+                  onClick={() => {
+                    viewVariables();
+                    writeAsync();
+                  }}
                   className="py-3 w-[150px] btn btn-primary flex items-centern justify-center text-center text-sm rounded-xl font-body font-medium cursor-pointer"
                 >
                   Proceed
