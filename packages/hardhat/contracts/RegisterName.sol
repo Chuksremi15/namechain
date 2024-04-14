@@ -90,7 +90,7 @@ contract RegisterName is Ownable {
 	}
 
 	/**
-	 * Function that allows the owner to withdraw the price paid for individual domain
+	 * Function that allows the owner to withdraw the price paid to the contract  for individual domain
 	 */
 	function withdraw(
 		address payable addr,

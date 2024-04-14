@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Balance } from "../Balance";
 import { AddressInfoDropdown } from "./AddressInfoDropdown";
 import { AddressQRCodeModal } from "./AddressQRCodeModal";
@@ -11,18 +12,24 @@ import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
 /**
  * Custom Wagmi Connect Button (watch balance + custom design)
  */
-export const RainbowKitCustomConnectButton = () => {
+export const rainbowKitCustomConnectButton = () => {
   useAutoConnect();
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
+  const [userAddress, setUserAddress] = useState<Address | undefined>("");
 
-  return (
+  const ConnectButtonHook = () => (
     <ConnectButton.Custom>
       {({ account, chain, openConnectModal, mounted }) => {
         const connected = mounted && account && chain;
+
         const blockExplorerAddressLink = account
           ? getBlockExplorerAddressLink(targetNetwork, account.address)
           : undefined;
+
+        const userAddress = account ? account.address : undefined;
+
+        setUserAddress(userAddress);
 
         return (
           <>
@@ -62,4 +69,6 @@ export const RainbowKitCustomConnectButton = () => {
       }}
     </ConnectButton.Custom>
   );
+
+  return { ConnectButtonHook, userAddress };
 };

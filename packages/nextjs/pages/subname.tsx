@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { NextPage } from "next";
+import { parseEther } from "viem";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { MetaHeader } from "~~/components/MetaHeader";
+import { rainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { FindName } from "~~/components/subname/FindName";
 import { RegisterName } from "~~/components/subname/RegisterName";
 
