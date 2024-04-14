@@ -12,9 +12,10 @@ type FindNameProps = {
   pages: number;
   setPages: Dispatch<SetStateAction<number>>;
   publicClient: PublicClient;
+  ensSubname: string;
 };
 
-export const RegisterName = ({ setPages, pages, publicClient }: FindNameProps) => {
+export const RegisterName = ({ setPages, pages, publicClient, ensSubname }: FindNameProps) => {
   const accountState = useAccount();
 
   const getGasPrice = async (_newPrice: number) => {
@@ -38,7 +39,7 @@ export const RegisterName = ({ setPages, pages, publicClient }: FindNameProps) =
   let [updatedPrice, setUpdatedPrice] = useState<number>(0.05);
   let [totalFee, setTotalFee] = useState<number | undefined>(0.05);
   let [gasPriceEstimate, setGasPriceEstimate] = useState<number | undefined>(0);
-  let [durationTimestamp, setDurationTimestamp] = useState<bigint>(0);
+  let [durationTimestamp, setDurationTimestamp] = useState<bigint>(0n);
 
   const incrementYears = () => (years < 5 ? setYears(years + 1) : null);
   const decrementYears = () => (years > 1 ? setYears(years - 1) : null);
@@ -84,7 +85,7 @@ export const RegisterName = ({ setPages, pages, publicClient }: FindNameProps) =
   const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
     contractName: "RegisterName",
     functionName: "newSubdomain",
-    args: ["remy", "onchain", accountState.address, 65536, durationTimestamp],
+    args: [ensSubname, "onchain", accountState.address, 65536, durationTimestamp],
     value: parseEther(String(updatedPrice)),
     onBlockConfirmation: txnReceipt => {
       console.log("📦 Transaction blockHash", txnReceipt.blockHash);
@@ -94,11 +95,11 @@ export const RegisterName = ({ setPages, pages, publicClient }: FindNameProps) =
   return (
     <motion.div key={"homeCard"} initial={{ y: 5 }} transition={{ years: 0.1 }} animate={{ y: "0" }} exit={{ y: "0" }}>
       <div className="py-8 container max-w-[600px] mx-auto flex flex-col gap-y-3 justify-center items-center">
-        <h3 className="text-2xl font-head font-semibold self-start">remy.eth</h3>
+        <h3 className="text-2xl font-head font-semibold self-start">{ensSubname}.onchain.eth</h3>
 
         <div className="flex flex-col bg-base-100 pt-1  text-center  w-[600px] items-center  rounded-xl shadow-sm ">
           <div className=" py-2 px-6  w-full  text-left flex flex-col gap-y-3 ">
-            <p className="font-body font-semibold text-xl ">Register Remy.eth</p>
+            <p className="font-body font-semibold text-xl ">Register {ensSubname}.onchain.eth</p>
 
             <div className="flex items-center justify-between border w-full py-2 px-3 rounded-full ">
               <MinusCircleIcon
