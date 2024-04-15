@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Dispatch, SetStateAction } from "react";
-import Error from "next/error";
 import { addEnsContracts } from "@ensdomains/ensjs";
 import { ClientWithEns } from "@ensdomains/ensjs/dist/types/contracts/consts";
 import { GetSubnamesReturnType, getSubnames } from "@ensdomains/ensjs/subgraph";
 import { motion } from "framer-motion";
 import { createPublicClient, http } from "viem";
-import { GetEnsAddressReturnType, normalize } from "viem/ens";
+import { normalize } from "viem/ens";
 import { PublicClient, sepolia } from "wagmi";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import useDebounce from "~~/hooks/customHook/useDebounce";
@@ -20,7 +19,7 @@ type FindNameProps = {
   ensSubname: string;
 };
 
-export const FindName = ({ setPages, pages, publicClient, setEnsSubname, ensSubname }: FindNameProps) => {
+export const FindName = ({ setPages, pages, setEnsSubname }: FindNameProps) => {
   const [isValid, setIsValid] = useState(true);
 
   const [error, setError] = useState("");
@@ -28,13 +27,13 @@ export const FindName = ({ setPages, pages, publicClient, setEnsSubname, ensSubn
   const [getSubnamesLoading, setGetSubnamesLoading] = useState<boolean>(true);
   const [updatedInput, setUpdatedInput] = useState("");
   // const [ensAddress, setEnsAddress] = useState<GetEnsAddressReturnType>(null);
-  const { currentValue, debouncedValue, setValue } = useDebounce(updatedInput, 500);
+  const { debouncedValue, setValue } = useDebounce(updatedInput, 500);
 
   const handleOnChange = async (e: string) => {
     try {
       //   setError("Enter a valid subname; exclude special characters and number");
 
-      let normalizeInput = normalize(e);
+      const normalizeInput = normalize(e);
       setEnsSubname(normalizeInput);
       setUpdatedInput(normalizeInput + ".onchain.eth");
       setValue(e);
@@ -66,23 +65,19 @@ export const FindName = ({ setPages, pages, publicClient, setEnsSubname, ensSubn
   useEffect(() => {
     const checkForAvailability = async () => {
       try {
-        console.log(subnames[0]);
-        subnames[0].forEach(({ labelName }) => {
-          console.log(labelName, debouncedValue);
-          if (labelName === debouncedValue) {
+        for (let i = 0; i < subnames[0].length; i++) {
+          if (debouncedValue === subnames[0][i].labelName) {
+            console.log("134");
             setIsValid(false);
+            return;
           } else {
             setIsValid(true);
           }
-        });
+        }
       } catch (error) {}
     };
     checkForAvailability();
   }, [debouncedValue]);
-
-  const logSubnames = () => {
-    console.log(subnames);
-  };
 
   return (
     <motion.div
@@ -93,9 +88,10 @@ export const FindName = ({ setPages, pages, publicClient, setEnsSubname, ensSubn
       exit={{ y: "0" }}
     >
       <div className="py-8 flex flex-col justify-center items-center">
-        <h3 className=" text-4xl font-head font-semibold ">Your web3 username </h3>
-        <p className="text-xl font-body  font-medium max-w-[500px] text-center">
-          Your identity across web3, one name for all your crypto addresses, and your decentralised website.
+        <h3 className=" text-4xl font-head font-semibold ">Your 3LD web3 username </h3>
+        <p className="text-xl font-body  font-medium max-w-[600px] text-center">
+          ENScheap allows you to own an 3LD ENS name for as low as 0.05ETH a year. The PARENT_CANNOT_CONTROL fuse is
+          burned alongside the registration so your 3DL domain name is Emancipated and you have full control.
         </p>
 
         <div className="flex flex-col gap-y-4">
@@ -111,9 +107,7 @@ export const FindName = ({ setPages, pages, publicClient, setEnsSubname, ensSubn
               <div className=" py-2 px-3  w-full  text-left flex items-center justify-between ">
                 <div className="flex items-center gap-x-3">
                   <div className="h-6 w-6 bg-blue-500 rounded-full" />
-                  <p onClick={logSubnames} className="font-body font-medium">
-                    {updatedInput}
-                  </p>
+                  <p className="font-body font-medium">{updatedInput}</p>
                 </div>
                 <div className="flex gap-x-2">
                   {isValid ? (

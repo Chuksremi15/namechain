@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import React, { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import type { NextPage } from "next";
-import { PublicClient, createPublicClient, formatEther, formatGwei, http, parseEther } from "viem";
-import { mainnet, sepolia } from "viem/chains";
-import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import { createPublicClient, http } from "viem";
+import { sepolia } from "viem/chains";
 import { MetaHeader } from "~~/components/MetaHeader";
-import { rainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { FindName } from "~~/components/subname/FindName";
 import { RegisterName } from "~~/components/subname/RegisterName";
 import scaffoldConfig from "~~/scaffold.config";
@@ -26,8 +24,9 @@ const Subname: NextPage = () => {
       pages={pages}
       setEnsSubname={setEnsSubname}
       ensSubname={ensSubname}
+      key={1}
     />,
-    <RegisterName publicClient={publicClient} setPages={setPages} pages={pages} ensSubname={ensSubname} />,
+    <RegisterName publicClient={publicClient} setPages={setPages} pages={pages} ensSubname={ensSubname} key={2} />,
   ];
 
   return (

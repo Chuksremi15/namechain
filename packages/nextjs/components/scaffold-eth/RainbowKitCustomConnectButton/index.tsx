@@ -16,7 +16,7 @@ export const rainbowKitCustomConnectButton = () => {
   useAutoConnect();
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
-  const [userAddress, setUserAddress] = useState<Address | undefined>("");
+  const [userAddress, setUserAddress] = useState<Address | string>("");
 
   const ConnectButtonHook = () => (
     <ConnectButton.Custom>
@@ -27,7 +27,7 @@ export const rainbowKitCustomConnectButton = () => {
           ? getBlockExplorerAddressLink(targetNetwork, account.address)
           : undefined;
 
-        const userAddress = account ? account.address : undefined;
+        const userAddress = account ? account.address : "";
 
         setUserAddress(userAddress);
 

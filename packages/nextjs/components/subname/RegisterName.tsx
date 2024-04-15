@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Dispatch, SetStateAction } from "react";
+import { useRouter } from "next/router";
 import { motion } from "framer-motion";
-import { formatEther, parseEther } from "viem";
-import { PublicClient, useAccount, useConnect } from "wagmi";
+import { Account, formatEther, parseEther } from "viem";
+import { PublicClient, useAccount } from "wagmi";
+import { GetAccountResult } from "wagmi/dist/actions";
 import { MinusCircleIcon, PlusCircleIcon } from "@heroicons/react/20/solid";
 import { Spinner } from "~~/components/assets/Spinner";
-import { rainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import { Address, Balance } from "~~/components/scaffold-eth";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 type FindNameProps = {
@@ -16,12 +18,14 @@ type FindNameProps = {
 };
 
 export const RegisterName = ({ setPages, pages, publicClient, ensSubname }: FindNameProps) => {
-  const accountState = useAccount();
+  const accountState: GetAccountResult<PublicClient> = useAccount();
+
+  const router = useRouter();
 
   const getGasPrice = async (_newPrice: number) => {
     try {
       const priceEstimate = await publicClient.estimateGas({
-        account: accountState.address,
+        account: "0x0294af9d4332A1f88FBC18A41d85d2666Ec42343",
         to: "0x0294af9d4332A1f88FBC18A41d85d2666Ec42343",
         value: parseEther(`${_newPrice}`),
       });
@@ -34,38 +38,28 @@ export const RegisterName = ({ setPages, pages, publicClient, ensSubname }: Find
     }
   };
 
-  let [years, setYears] = useState<any>(1);
-  let [priceLoading, setPriceLoading] = useState<boolean>(false);
-  let [updatedPrice, setUpdatedPrice] = useState<number>(0.05);
-  let [totalFee, setTotalFee] = useState<number | undefined>(0.05);
-  let [gasPriceEstimate, setGasPriceEstimate] = useState<number | undefined>(0);
-  let [durationTimestamp, setDurationTimestamp] = useState<bigint>(0n);
+  const [years, setYears] = useState<any>(1);
+  const [priceLoading, setPriceLoading] = useState<boolean>(false);
+  const [updatedPrice, setUpdatedPrice] = useState<number>(0.05);
+  const [totalFee, setTotalFee] = useState<number | undefined>(0.05);
+  const [gasPriceEstimate, setGasPriceEstimate] = useState<number | undefined>(0);
+  const [durationTimestamp, setDurationTimestamp] = useState<bigint>(0n);
 
   const incrementYears = () => (years < 5 ? setYears(years + 1) : null);
   const decrementYears = () => (years > 1 ? setYears(years - 1) : null);
 
-  const { userAddress } = rainbowKitCustomConnectButton();
-
-  const price: number = 0.05;
-
-  useEffect(() => {
-    if (accountState.isConnected) {
-      console.log(accountState.address);
-    }
-
-    console.log(new Date().setFullYear(new Date().getFullYear() + 5));
-  }, [userAddress]);
+  const price = 0.05;
 
   const handleYearsChange = async () => {
     setPriceLoading(true);
 
-    let _durationTimestamp = new Date().setFullYear(new Date().getFullYear() + years);
+    const _durationTimestamp = new Date().setFullYear(new Date().getFullYear() + years);
     setDurationTimestamp(BigInt(_durationTimestamp));
 
-    let newPrice = Math.round(price * years * 100) / 100;
+    const newPrice = Math.round(price * years * 100) / 100;
     setUpdatedPrice(newPrice);
 
-    let valueEstimateGasPrice: string | undefined = await getGasPrice(newPrice);
+    const valueEstimateGasPrice: string | undefined = await getGasPrice(newPrice);
 
     setGasPriceEstimate(Number(valueEstimateGasPrice));
 
@@ -82,13 +76,14 @@ export const RegisterName = ({ setPages, pages, publicClient, ensSubname }: Find
     console.log(["remy", "onchain", accountState.address, 65536, durationTimestamp]);
   };
 
-  const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
+  const { writeAsync } = useScaffoldContractWrite({
     contractName: "RegisterName",
     functionName: "newSubdomain",
     args: [ensSubname, "onchain", accountState.address, 65536, durationTimestamp],
     value: parseEther(String(updatedPrice)),
     onBlockConfirmation: txnReceipt => {
       console.log("📦 Transaction blockHash", txnReceipt.blockHash);
+      router.push("/mynames");
     },
   });
 

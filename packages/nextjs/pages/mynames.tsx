@@ -3,15 +3,14 @@ import { addEnsContracts } from "@ensdomains/ensjs";
 import { ClientWithEns } from "@ensdomains/ensjs/dist/types/contracts/consts";
 import { GetSubnamesReturnType, getSubnames } from "@ensdomains/ensjs/subgraph";
 import type { NextPage } from "next";
-import { PublicClient, createPublicClient, formatEther, formatGwei, http, parseEther } from "viem";
-import { mainnet, sepolia } from "viem/chains";
-import { useAccount, useConnect } from "wagmi";
+import { createPublicClient, http } from "viem";
+import { sepolia } from "viem/chains";
+import { useAccount } from "wagmi";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { Spinner } from "~~/components/assets/Spinner";
 import scaffoldConfig from "~~/scaffold.config";
 
 const MyNames: NextPage = () => {
-  const [subnames, setSubnames] = useState<GetSubnamesReturnType[]>([]);
   const [getSubnamesLoading, setGetSubnamesLoading] = useState<boolean>(true);
   const [userNames, setUserNames] = useState<Array<string | null>>([]);
 
@@ -22,29 +21,25 @@ const MyNames: NextPage = () => {
     transport: http(`https://eth-sepolia.g.alchemy.com/v2/${scaffoldConfig.alchemyApiKey}`),
   });
 
-  useEffect(() => {
-    const getSubnameOfOnchain = async () => {
-      setGetSubnamesLoading(true);
-      const result: GetSubnamesReturnType = await getSubnames(ensPublicClient, { name: "onchain.eth" });
+  const getSubnameOfOnchain = async () => {
+    setGetSubnamesLoading(true);
+    const result: GetSubnamesReturnType = await getSubnames(ensPublicClient, { name: "onchain.eth" });
 
-      let myNameArr: Array<string | null> = [];
+    const myNameArr: Array<string | null> = [];
 
-      result.forEach(({ wrappedOwner, labelName }) => {
-        if (wrappedOwner === accountState.address) {
-          myNameArr.push(labelName);
-          setUserNames(myNameArr);
-        }
-      });
+    result.forEach(({ wrappedOwner, labelName }) => {
+      if (wrappedOwner === accountState.address) {
+        myNameArr.push(labelName);
+        setUserNames(myNameArr);
+      }
+    });
 
-      setGetSubnamesLoading(false);
-    };
-
-    getSubnameOfOnchain();
-  }, []);
-
-  const filterMynames = () => {
-    console.log(userNames);
+    setGetSubnamesLoading(false);
   };
+
+  useEffect(() => {
+    getSubnameOfOnchain();
+  }, [accountState.address]);
 
   return (
     <>
@@ -61,17 +56,17 @@ const MyNames: NextPage = () => {
             <div></div>
           ) : (
             userNames.map((label, index) => (
-              <div className="flex justify-between w-full border-b bg-base-100 pt-1  px-4 text-center  shadow-sm ">
+              <div
+                key={index}
+                className="flex justify-between w-full border-b bg-base-100 pt-1  px-4 text-center  shadow-sm "
+              >
                 <div className="flex items-center gap-x-3">
                   <div className="h-6 w-6 bg-blue-500 rounded-full" />
                   <p className="font-body font-medium">{label}.onchain.eth</p>
                 </div>
 
                 <div>
-                  <p
-                    onClick={filterMynames}
-                    className="btn btn-xs capitalize bg-green-50  text-green-500 rounded-full w-[70px] text-xs text-center font-body font-medium"
-                  >
+                  <p className="btn btn-xs capitalize bg-green-50  text-green-500 rounded-full w-[70px] text-xs text-center font-body font-medium">
                     owner
                   </p>
                 </div>
