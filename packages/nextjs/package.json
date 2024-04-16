@@ -22,7 +22,6 @@
     "@uniswap/v2-sdk": "^3.0.1",
     "blo": "^1.0.1",
     "daisyui": "^3.5.1",
-    "firebase": "^9.9.0",
     "framer-motion": "^11.0.28",
     "next": "^13.1.6",
     "nextjs-progressbar": "^0.0.16",
