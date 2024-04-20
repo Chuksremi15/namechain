@@ -53,5 +53,10 @@
     "type-fest": "^4.6.0",
     "typescript": "^5.1.6",
     "vercel": "^28.15.1"
+  },
+  "overrides": {
+    "@ensdomains/ensjs": {
+      "viem": "2.9.2"
+    }
   }
 }
