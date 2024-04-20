@@ -13207,7 +13207,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-
+"se-2@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "se-2@workspace:."
+  dependencies:
+    husky: ^8.0.1
+    lint-staged: ^13.0.3
+  languageName: unknown
+  linkType: soft
 
 "secp256k1@npm:^4.0.1":
   version: 4.0.3
